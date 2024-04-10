@@ -1,16 +1,28 @@
 <?php
 require_once './config/database.php';
-
 $db = connect();
 
-$request = $db->prepare("INSERT INTO users (firstname, lastname, username) VALUES (:firstname, :lastname, :username)");
-$request->bindValue(':firstname', 'Marc');
-$request->bindValue(':lastname', 'Baribaud');
-$request->bindValue(':username', 'mb96');
+
+// TODO variables
+
+
+//TODO boucles
+
+
+
+
+$request = $db->prepare("SELECT * FROM users;");
 $request->execute();
+$students = $request->fetchAll();
+
+// TODO for
+// TODO while
+
+foreach($students as $student){
+    echo $student['firstname'] . ' / ' . $student['lastname'] . ' / ' . $student['username'] . '<br>';
+}
 
 ?>
-
 
 
 <!DOCTYPE html>
@@ -22,8 +34,5 @@ $request->execute();
 </head>
 <body>
 <h1>PHP Test Page</h1>
-<?php
-echo 'lol mdr';
-?>
 </body>
 </html>
