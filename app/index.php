@@ -2,6 +2,11 @@
 require_once './config/database.php';
 $db = connect();
 
+/*
+ * TODO : Créer un formulaire d'enregistrement de véhicule, une vue avec un tableau des voitures enregistrées
+ */
+
+
 ?>
 
 
