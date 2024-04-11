@@ -24,7 +24,7 @@ services:
       MYSQL_PASSWORD: dev
       MYSQL_DATABASE: php_course
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - ./bdd/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
