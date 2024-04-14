@@ -1,19 +1,43 @@
 <?php
-require_once './config/database.php';
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+ini_set('memory_limit', "1024M");
+ini_set('max_execution_time', 600);
+
+require './config/database.php';
+require './entities/Car.php';
+
 $db = connect();
 
 // Insertion dans la base de données
-if(isset($_POST['model']) && isset($_POST['brand']) && isset($_POST['price']) && isset($_POST['nb_seat'])) {
-    $request = $db->prepare("INSERT INTO cars (model, brand, price, nb_seat) VALUES (:model, :brand, :price, :nb_seat)");
-    $request->bindValue(':model', $_POST['model']);
-    $request->bindValue(':brand', $_POST['brand']);
-    $request->bindValue(':price', $_POST['price']);
-    $request->bindValue(':nb_seat', $_POST['nb_seat']);
-    $request->execute();
+if(isset($_POST['insert-car'])) {
+    Car::create(
+        db: $db,
+        model: $_POST['model'],
+        brand: $_POST['brand'],
+        price: $_POST['price'],
+        nbSeat: $_POST['nb_seat']
+    );
 }
 
-// Récupération des utilisateurs
-$query = $db->prepare("SELECT model, brand, price, nb_seat FROM cars");
+// Suppression d'une entrée dans la base de données
+if(isset($_POST['delete-car'])){
+    $car = new Car(db: $db, id: $_POST['id-car']);
+    $car->delete();
+}
+
+// Mise à jour d'une entrée dans la base de données
+if(isset($_POST['update-car'])){
+    $car = new Car(db: $db, id: $_POST['id-car']);
+    $car->setModel($_POST['model']);
+    $car->setBrand($_POST['brand']);
+    $car->setPrice($_POST['price']);
+    $car->setNbSeat($_POST['nb_seat']);
+    $car->update();
+}
+
+// Récupération des cars
+$query = $db->prepare("SELECT id, model, brand, price, nb_seat FROM cars");
 $query->execute();
 $cars = $query->fetchAll(PDO::FETCH_OBJ);
 ?>
@@ -25,7 +49,7 @@ $cars = $query->fetchAll(PDO::FETCH_OBJ);
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Formulaire de d'enregistrement de voiture</title>
-        <link rel="stylesheet" href="css/styles.css">
+        <link rel="stylesheet" href="public/css/styles.css">
     </head>
     <body>
         <h1>PHP Test Page</h1>
@@ -36,18 +60,27 @@ $cars = $query->fetchAll(PDO::FETCH_OBJ);
                     <th>Marque</th>
                     <th>Prix</th>
                     <th>Places</th>
+                    <th>Action</th>
                 </tr>
                 <?php foreach ($cars as $car): ?>
-                    <tr>
-                        <td><?= $car->model ?></td>
-                        <td><?= $car->brand ?></td>
-                        <td><?= $car->price ?></td>
-                        <td><?= $car->nb_seat ?></td>
-                    </tr>
+                    <form class="form-cars" method="POST">
+                        <tr>
+
+                            <td><input type="text" name="model" value="<?= $car->model ?>"/></td>
+                            <td><input type="text" name="brand" value="<?= $car->brand ?>"/></td>
+                            <td><input type="number" name="price" value="<?= $car->price ?>"/></td>
+                            <td><input type="number" name="nb_seat" value="<?= $car->nb_seat ?>"/></td>
+                            <td>
+                                <input type="hidden" name="id-car" value="<?= $car->id ?>"/>
+                                <button class="delete-car" name="delete-car">Supprimer</button>
+                                <button class="update-car" name="update-car">Modifier</button>
+                            </td>
+                        </tr>
+                    </form>
                 <?php endforeach;?>
             </table>
         <?php endif;?>
-        <form id="form_cars" method="POST">
+        <form id="form_car" method="POST">
             <label for="model">Modèle :</label>
             <input type="text" id="model" name="model" placeholder="Modèle du véhicule..">
 
@@ -60,9 +93,9 @@ $cars = $query->fetchAll(PDO::FETCH_OBJ);
             <label for="nb_seat">Nombres de places :</label>
             <input type="text" id="nb_seat" name="nb_seat" placeholder="Places du véhicule..">
 
-            <input type="button" id="submit-btn" value="Confirmer">
+            <input type="submit" name="insert-car" id="submit-btn" value="Confirmer">
         </form>
 
-        <script src="js/script.js"></script>
+        <script src="public/js/script.js"></script>
     </body>
 </html>
