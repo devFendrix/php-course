@@ -14,7 +14,6 @@ class Car {
     private string $brand;
     private float $price;
     private int $nbSeat;
-    private string $owner;
     private PDO $db;
     public function __construct($db, $id)
     {
@@ -33,7 +32,6 @@ class Car {
         $this->brand = $car->brand;
         $this->price = $car->price;
         $this->nbSeat = $car->nb_seat;
-        $this->owner = $car->owner;
         $this->db = $db;
     }
 
@@ -41,14 +39,13 @@ class Car {
     // Permet d'instancier un objet Car avec 4 parametres et de l'insert dans la table cars
     // db = bdd, model=string, brand=string, price=float, nb_seat = int
 
-    public static function create($db, $model, $brand, $price, $nbSeat, $owner): Car
+    public static function create($db, $model, $brand, $price, $nbSeat): Car
     {
-        $query = $db->prepare("INSERT INTO cars (model, brand, price, nb_seat, $owner) VALUES (:model, :brand, :price, :nb_seat, :owner)");
+        $query = $db->prepare("INSERT INTO cars (model, brand, price, nb_seat) VALUES (:model, :brand, :price, :nb_seat)");
         $query->bindValue(':model', $model);
         $query->bindValue(':brand', $brand);
         $query->bindValue(':price', $price);
         $query->bindValue(':nb_seat', $nbSeat, PDO::PARAM_INT);
-        $query->bindValue(':owner', $owner);
         $query->execute();
 
         $id = $db->lastInsertId();
@@ -72,12 +69,11 @@ class Car {
     // il manque les parametres ?
     public function update(): void
     {
-        $query = $this->db->prepare("UPDATE cars SET model = :model, brand = :brand, price = :price, nb_seat = :nb_seat, owner = :owner WHERE id = :id");
+        $query = $this->db->prepare("UPDATE cars SET model = :model, brand = :brand, price = :price, nb_seat = :nb_seat WHERE id = :id");
         $query->bindValue(':model', $this->model);
         $query->bindValue(':brand', $this->brand);
         $query->bindValue(':price', $this->price);
         $query->bindValue(':nb_seat', $this->nbSeat, PDO::PARAM_INT);
-        $query->bindValue(':owner', $this->owner, PDO::PARAM_INT);
         $query->bindValue(':id', $this->id, PDO::PARAM_INT);
         $query->execute();
     }

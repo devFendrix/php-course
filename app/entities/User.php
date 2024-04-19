@@ -30,7 +30,7 @@ class User {
         $this->username = $user->username;
         $this->db = $db;
     }
-    public static function create($firstname, $lastname, $username, $db): User
+    public static function create($db, $firstname, $lastname, $username): User
     {
         $query = $db->prepare("INSERT INTO users (firstname, lastname, username) VALUES (:firstname, :lastname, :username)");
         $query->bindValue(':firstname', $firstname);
@@ -40,7 +40,7 @@ class User {
 
         $id = $db->lastInsertId();
 
-        return new Car($db, $id);
+        return new User($db, $id);
     }
 
     public function delete(): void
@@ -52,9 +52,10 @@ class User {
 
     public function update($firstname, $lastname, $username): void
     {
-        $query = $this->db->prepare("UPDATE users SET firstname = :firstname, lastname = :lastname WHERE id = :id");
+        $query = $this->db->prepare("UPDATE users SET firstname = :firstname, lastname = :lastname, username = :username WHERE id = :id");
         $query->bindValue(":firstname", $firstname);
         $query->bindValue(":lastname", $lastname);
+        $query->bindValue(":username", $username);
         $query->bindValue(":id", $this->id);
         $query->execute();
 
