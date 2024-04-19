@@ -15,8 +15,8 @@ class User {
     public function __construct($db, $id)
     {
         $query = $db->prepare("SELECT * FROM users WHERE id = :id");
-        $query->bindValue(":id", $id);
-        $query->execute(['id' => $id]);
+        $query->bindValue(":id", $id, PDO::PARAM_INT);
+        $query->execute();
 
         $user = $query->fetchObject();
 
@@ -46,16 +46,16 @@ class User {
     public function delete(): void
     {
         $query = $this->db->prepare("DELETE FROM users WHERE id = :id");
-        $query->bindValue(":id", $this->id);
+        $query->bindValue(":id", $this->id, PDO::PARAM_INT);
         $query->execute();
     }
 
-    public function update($firstname, $lastname, $username): void
+    public function update(): void
     {
         $query = $this->db->prepare("UPDATE users SET firstname = :firstname, lastname = :lastname, username = :username WHERE id = :id");
-        $query->bindValue(":firstname", $firstname);
-        $query->bindValue(":lastname", $lastname);
-        $query->bindValue(":username", $username);
+        $query->bindValue(":firstname", $this->firstname);
+        $query->bindValue(":lastname", $this->lastname);
+        $query->bindValue(":username", $this->username);
         $query->bindValue(":id", $this->id);
         $query->execute();
 

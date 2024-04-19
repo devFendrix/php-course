@@ -6,6 +6,7 @@ ini_set('max_execution_time', 600);
 
 require './config/database.php';
 require './entities/Car.php';
+require './entities/User.php';
 
 $db = connect();
 
@@ -16,7 +17,8 @@ if(isset($_POST['insert-car'])) {
         model: $_POST['model'],
         brand: $_POST['brand'],
         price: $_POST['price'],
-        nbSeat: $_POST['nb_seat']
+        nbSeat: $_POST['nb_seat'],
+        ownerId: $_POST['owners']
     );
 }
 
@@ -37,9 +39,14 @@ if(isset($_POST['update-car'])){
 }
 
 // Récupération des cars
-$query = $db->prepare("SELECT id, model, brand, price, nb_seat FROM cars");
+$query = $db->prepare("SELECT id, model, brand, price, nb_seat, owner_id FROM cars");
 $query->execute();
 $cars = $query->fetchAll(PDO::FETCH_OBJ);
+
+// Récupération des clients
+$query = $db->prepare("SELECT id, firstname, lastname FROM users");
+$query->execute();
+$customers = $query->fetchAll(PDO::FETCH_OBJ);
 ?>
 
 
@@ -60,9 +67,18 @@ $cars = $query->fetchAll(PDO::FETCH_OBJ);
                     <th>Marque</th>
                     <th>Prix</th>
                     <th>Places</th>
+                    <th>Propriétaire</th>
                     <th>Action</th>
                 </tr>
-                <?php foreach ($cars as $car): ?>
+                <?php
+                    foreach ($cars as $car):
+                        $customer = '';
+                        if(!empty($car->owner_id)) {
+                            $user = new User($db, $car->owner_id);
+                            $customer = $user->getFirstname() . ' ' . $user->getLastname();
+                        }
+
+                ?>
                     <form class="form-cars" method="POST">
                         <tr>
 
@@ -70,6 +86,7 @@ $cars = $query->fetchAll(PDO::FETCH_OBJ);
                             <td><input type="text" name="brand" value="<?= $car->brand ?>"/></td>
                             <td><input type="number" name="price" value="<?= $car->price ?>"/></td>
                             <td><input type="number" name="nb_seat" value="<?= $car->nb_seat ?>"/></td>
+                            <td><?= $customer ?></td>
                             <td>
                                 <input type="hidden" name="id-car" value="<?= $car->id ?>"/>
                                 <button class="delete-car" name="delete-car">Supprimer</button>
@@ -92,6 +109,13 @@ $cars = $query->fetchAll(PDO::FETCH_OBJ);
 
             <label for="nb_seat">Nombres de places :</label>
             <input type="text" id="nb_seat" name="nb_seat" placeholder="Places du véhicule..">
+
+            <label for="owners">Propriétaires :</label>
+            <select name="owners" id="owners">
+                <?php foreach ($customers as $customer):?>
+                    <option value="<?= $customer->id ?>"><?= $customer->firstname . ' ' . $customer->lastname ?></option>
+                <?php endforeach;?>
+            </select>
 
             <input type="submit" name="insert-car" id="submit-btn" value="Confirmer">
         </form>
