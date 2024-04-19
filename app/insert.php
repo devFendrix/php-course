@@ -1,18 +1,40 @@
 <?php
-require_once './config/database.php';
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+ini_set('memory_limit', "1024M");
+ini_set('max_execution_time', 600);
+
+require './config/database.php';
+require './entities/User.php';
+
 $db = connect();
 
 // Insertion dans la base de données
-if(isset($_POST['firstname']) && isset($_POST['lastname']) && isset($_POST['username'])) {
-    $request = $db->prepare("INSERT INTO users (firstname, lastname, username) VALUES (:firstname, :lastname, :username)");
-    $request->bindValue(':firstname', $_POST['firstname']);
-    $request->bindValue(':lastname', $_POST['lastname']);
-    $request->bindValue(':username', $_POST['username']);
-    $request->execute();
+if(isset($_POST['insert-user'])) {
+    User::create(
+        db: $db,
+        firstname: $_POST['firstname'],
+        lastname: $_POST['lastname'],
+        username: $_POST['username']
+    );
+}
+// Suppression d'une entrée dans la base de données
+if(isset($_POST['delete-user'])){
+    $user = new User(db: $db, id: $_POST['id-user']);
+    $user->delete();
+}
+
+// Mise à jour d'une entrée dans la base de données
+if(isset($_POST['update-user'])){
+    $user = new User(db: $db, id: $_POST['id-user']);
+    $user->setFirstname($_POST['firstname']);
+    $user->setLastname($_POST['lastname']);
+    $user->setUsername($_POST['username']);
+    $user->update();
 }
 
 // Récupération des utilisateurs
-$query = $db->prepare("SELECT firstname, lastname, username FROM users");
+$query = $db->prepare("SELECT firstname, lastname, username, id FROM users");
 $query->execute();
 $users = $query->fetchAll(PDO::FETCH_OBJ);
 ?>
@@ -23,7 +45,7 @@ $users = $query->fetchAll(PDO::FETCH_OBJ);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulaire de base</title>
+    <title>Formulaire des utilisateurs </title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -82,13 +104,21 @@ $users = $query->fetchAll(PDO::FETCH_OBJ);
             <th>Prénom</th>
             <th>Nom</th>
             <th>Pseudo</th>
+            <th>Action</th>
         </tr>
         <?php foreach ($users as $user): ?>
+        <form class="form-users" method="POST">
             <tr>
-                <td><?= $user->firstname ?></td>
-                <td><?= $user->lastname ?></td>
-                <td><?= $user->username ?></td>
+                <td><input type="text" name="firstname" value="<?= $user->firstname ?>"/></td>
+                <td><input type="text" name="lastname" value="<?= $user->lastname ?>"/></td>
+                <td><input type="text" name="username" value="<?= $user->username ?>"/></td>
+                <td>
+                    <input type="hidden" name="id-user" value="<?= $user->id ?>"/>
+                    <button class="delete-user" name="delete-user">Supprimer</button>
+                    <button class="update-user" name="update-user">Modifier</button>
+                </td>
             </tr>
+        </form>
         <?php endforeach;?>
     </table>
 <?php endif;?>
@@ -103,7 +133,7 @@ $users = $query->fetchAll(PDO::FETCH_OBJ);
     <label for="username">Pseudo :</label>
     <input type="text" id="username" name="username" placeholder="Votre pseudo..">
 
-    <input type="button" id="submit-btn" value="Envoyer">
+    <input type="submit" name="insert-user" id="submit-btn" value="Envoyer">
 </form>
 
 <script>
@@ -113,13 +143,13 @@ $users = $query->fetchAll(PDO::FETCH_OBJ);
     const username = document.getElementById('username')
     const submitBtn = document.getElementById('submit-btn')
 
-    submitBtn.addEventListener('click', function() {
+    /*submitBtn.addEventListener('click', function() {
         if(firstname.value.length > 0 && lastname.value.length > 0 && username.value.length > 0){
             formUser.submit()
         } else {
             console.log('Une des trois valeurs est vide')
         }
-    })
+    })*/
 </script>
 </body>
 </html>
