@@ -9,6 +9,18 @@ require './entities/User.php';
 
 $db = connect();
 
+if(isset($_POST['insert-user'])){
+    $query = $db->prepare("INSERT INTO users (firstname, lastname, username) VALUES (:firstname, :lastname, :username);");
+    $query->bindValue(':firstname', $_POST['firstname']);
+    $query->bindValue(':lastname', $_POST['lastname']);
+    $query->bindValue(':username', $_POST['username']);
+    $query->execute();
+}
+
+$query = $db->prepare("SELECT * FROM users");
+$query->execute();
+$users = $query->fetchAll(PDO::FETCH_OBJ);
+
 ?>
 
 
