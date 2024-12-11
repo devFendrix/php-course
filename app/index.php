@@ -8,7 +8,6 @@ require './config/database.php';
 require './entities/User.php';
 
 $db = connect();
-
 if(isset($_POST['insert-user'])){
     $query = $db->prepare("INSERT INTO users (firstname, lastname, username) VALUES (:firstname, :lastname, :username);");
     $query->bindValue(':firstname', $_POST['firstname']);
