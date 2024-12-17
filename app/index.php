@@ -16,7 +16,7 @@ if(isset($_POST['insert-user'])){
     $query->execute();
 }
 
-$query = $db->prepare("SELECT * FROM users");
+$query = $db->prepare("SELECT firstname, lastname, username FROM users");
 $query->execute();
 $users = $query->fetchAll(PDO::FETCH_OBJ);
 
@@ -79,20 +79,37 @@ $users = $query->fetchAll(PDO::FETCH_OBJ);
     </style>
 </head>
 <body>
-<h1>PHP Test Page</h1>
+    <h1>PHP Test Page</h1>
 
-<form id="form_user" method="POST">
-    <label for="firstname">Prénom :</label>
-    <input type="text" id="firstname" name="firstname" placeholder="Votre prénom..">
+    <table>
+        <tr>
+            <th>Prénom</th>
+            <th>Nom</th>
+            <th>Pseudonyme</th>
+        </tr>
 
-    <label for="lastname">Nom :</label>
-    <input type="text" id="lastname" name="lastname" placeholder="Votre nom..">
+        <?php foreach ($users as $user): ?>
+            <tr>
+                <td><?= $user->firstname ?></td>
+                <td><?= $user->lastname ?></td>
+                <td><?= $user->username ?></td>
+            </tr>
+        <?php endforeach; ?>
+    </table>
 
-    <label for="username">Pseudo :</label>
-    <input type="text" id="username" name="username" placeholder="Votre pseudo..">
 
-    <input type="submit" name="insert-user" id="submit-btn" value="Envoyer">
-</form>
+    <form id="form_user" method="POST">
+        <label for="firstname">Prénom :</label>
+        <input type="text" id="firstname" name="firstname" placeholder="Votre prénom..">
+
+        <label for="lastname">Nom :</label>
+        <input type="text" id="lastname" name="lastname" placeholder="Votre nom..">
+
+        <label for="username">Pseudo :</label>
+        <input type="text" id="username" name="username" placeholder="Votre pseudo..">
+
+        <input type="submit" name="insert-user" id="submit-btn" value="Envoyer">
+    </form>
 
 </body>
 </html>
