@@ -20,6 +20,10 @@ $query = $db->prepare("SELECT firstname, lastname, username FROM users");
 $query->execute();
 $users = $query->fetchAll(PDO::FETCH_OBJ);
 
+if(isset($_POST['insert-user'])){
+    $query = $db->prepare(query:"INSERT INTO users (first)"
+}
+
 ?>
 
 
