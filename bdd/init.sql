@@ -11,6 +11,6 @@
         FOREIGN KEY (commande_id) REFERENCES client(id)
     );
 
-    INSERT INTO client (firstname,lastname) VALUES ('Noah', 'Langlois');
+    INSERT INTO client (firstname,lastname) VALUES ('coco', 'lala');
 
     INSERT INTO commande (commande_id, price) VALUES ('78936437203', ('20,4€'));
