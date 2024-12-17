@@ -10,7 +10,7 @@ $db = connect();
 
 
 /**
- * Créer un formulaire permettant l'enregistrement d'appartement 
+ * Créer un formulaire permettant l'enregistrement d'appartement
  */
 ?>
 
